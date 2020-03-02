@@ -4,17 +4,23 @@ class DiceGame{
 		this.dicesCount = dicesCount;
 	}
 
-	//Create one player instance with desired number of dices
-	createPlayer(playerNumber){
-		this.player = {
-			playerNumber: playerNumber,
-			dices: this.createDicesPerPlayer(),
-			active: true,
-			winner: false,
-		}
-		return this.player;
-	};
+	//Create desired number of player instances
+	createPlayersCount(){
+		this.players = [];
+		for (let i=0; i<this.playersCount; i++){
+			this.players.push(
+				this.player = {
+					playerNumber: i+1,
+					dices: this.createDicesPerPlayer(),
+					active: true,
+					winner: false
+				}
+			);
+		};
+		return this.players;
+	};	
 
+	//Create desired number of dices per player
 	createDicesPerPlayer(){
 		this.dicesPerPlayer = [];
 		for (let i=0; i<this.dicesCount; i++){
@@ -23,21 +29,12 @@ class DiceGame{
 		return this.dicesPerPlayer;
 	};
 
-	//Create desired number of player instances
-	createPlayersCount(){
-		this.players = [];
-		for (let i=0; i<this.playersCount; i++){
-			this.players.push(this.createPlayer(i+1));
-		};
-		return this.players;
-	};	
-
 	//Initialize Game
 	initializeGame(){
 		this.validation();
 		if (this.isValid === true){
 			this.createPlayersCount();
-			Renderer.renderPlayersCreate(this.players);
+			this.renderPlayersCreate();
 		};
 	};
 
@@ -51,11 +48,11 @@ class DiceGame{
 			Renderer.showAlert(btnCreate, "Please, fill all the requed fields.");
 		} else if (!this.playersCount.match(regEx) || !this.dicesCount.match(regEx)){
 			Renderer.showAlert(btnCreate, "Please, enter the numbers only.");
-		} else if ((dicesCount < 1 || dicesCount > 6) && (peopleCount < 2 || playersCount > 10)){
+		} else if ((this.dicesCount < 1 || this.dicesCount > 6) && (this.peopleCount < 2 || this.playersCount > 10)){
 			Renderer.showAlert(btnCreate, "Please, enter correct number of people or dices.");
-		} else if (dicesCount < 1 || dicesCount > 6){
+		} else if (this.dicesCount < 1 || this.dicesCount > 6){
 			Renderer.showAlert(btnCreate, "Please, enter correct number of dices.");
-		} else if (playersCount < 2 || playersCount > 10){
+		} else if (this.playersCount < 2 || this.playersCount > 10){
 			Renderer.showAlert(btnCreate, "Please, enter correct number of people.");
 		} else{
 			this.isValid = true;
@@ -75,17 +72,18 @@ class DiceGame{
 		this.getWinners();
 
 		//render shaked players to HTML
-		Renderer.renderPlayersShaked(this.players);
+		this.renderPlayersShaked();
 
 		//change shake button content
 		const btn = document.querySelector(".btn");
 		setTimeout(() => btn.innerHTML = "Shake again!", 1000);
 
-		//show players with higher sum in main heading
-		Renderer.renderMainHeading(this.players, this.winners, true);
+		//show players with the highest sum in main heading
+		this.renderMainHeading(true);
 
 		//compare results, set the next shake 
 		this.setTheNextShake();
+		console.log(this.players);
 	};
 
 	//get new numbers
@@ -121,9 +119,9 @@ class DiceGame{
 	setTheNextShake(){
 		if (this.winners.length === 1){
 			// if there's only one winner => reset all player's status to active, so everyone can play again
-			this.players.forEach(player => player.active = true);
+			this.players.forEach((player) => player.active = true);
 		} else {
-			// if there's more than one winner => only those player's status is left active, other player's status is set to false
+			// if there's more than one winner => only those players status is left active, other players status is set to false
 			this.players.forEach(player => {
 				if(this.winners.includes(player.playerNumber) !== true){
 					player.active = false;
@@ -131,20 +129,18 @@ class DiceGame{
 			});	
 		}
 	};
-}
 
-class Renderer{
 	//Render to HTML
-	static renderPlayers(players, isShaked){
+	renderPlayers(isShaked){
 		const container = document.querySelector("main .container");
-		players.forEach((item,index) => {
+		this.players.forEach((item,index) => {
 			const div = document.createElement("div");
 			div.className = "dice";
 			let p = document.createElement("p");
-			p.innerHTML = `Player ${players[index].playerNumber}`;
+			p.innerHTML = `Player ${item.playerNumber}`;
 			if(isShaked === true){
 				setTimeout(()=> {
-					p.innerHTML += ` (<strong>${players[index].sum}</strong>)`;
+					p.innerHTML += ` (<strong>${item.sum}</strong>)`;
 				}, 1000);
 			};
 			if(item.winner === true){
@@ -169,15 +165,15 @@ class Renderer{
 	};
 
 	//Render to HTML - created players by user
-	static renderPlayersCreate(players){		
+	renderPlayersCreate(){		
 		if(document.querySelector(".dice") === null){
-			Renderer.renderPlayers(players);
+			this.renderPlayers();
 		} else{
 			document.querySelectorAll(".dice").forEach(item => item.remove());
-			Renderer.renderPlayers(players);
+			this.renderPlayers();
 		}
 
-		Renderer.renderMainHeading();
+		this.renderMainHeading();
 		
 		//Just some DOM manimulation
 		const btn = document.querySelector(".btn");
@@ -212,54 +208,39 @@ class Renderer{
 	};
 
 	//Render to HTML - players shaked by computer
-	static renderPlayersShaked(shakedPlayers){		
-		shakedPlayers = shakedPlayers.filter(player => player.active === true);
+	renderPlayersShaked(){		
+		this.players = this.players.filter(player => player.active === true);
 
 		if(document.querySelector(".dice") === null){
-			Renderer.renderPlayers(shakedPlayers, true);
+			this.renderPlayers(true);
 		} else{
 			document.querySelectorAll(".dice").forEach(item => item.remove());
-			Renderer.renderPlayers(shakedPlayers, true);
+			this.renderPlayers(true);
 		}
 	};
 
-	//Show alert massage
-	static showAlert(button, massage){
-		const subheader = document.querySelector(".subheader");
-		const p = subheader.querySelector("p");
-		subheader.classList.add("subheader-visible");
-		p.innerText = massage;
-		button.classList.add("btn-shake-animation");
-		setTimeout(()=>{
-			button.classList.remove("btn-shake-animation");
-		}, 820);
-		setTimeout(()=>{
-			subheader.classList.remove("subheader-visible");
-		}, 3000);	
-	};
-
 	//show results in main heading
-	static renderMainHeading(players, winners, isShaked){
+	renderMainHeading(isShaked){
 		const title = document.querySelector(".buttons h1");
 		title.innerHTML = "C'mon, show them who is the BOSS";
 		title.classList.remove("winner");
 
 		if(isShaked === true){
-			if(winners.length === 1){
+			if(this.winners.length === 1){
 				setTimeout(()=>{
-					title.innerHTML = `Player ${winners[0]} wins!`;
+					title.innerHTML = `Player ${this.winners[0]} wins!`;
 					title.classList.add("winner");
 				}, 1000);	
 			} else{
-				winners.sort((a,b) => a-b);
+				this.winners.sort((a,b) => a-b);
 				setTimeout(()=>{
-					title.innerHTML = `Draw! Players ${winners.slice(0, winners.length-1).join(", ")} and ${winners[winners.length-1]} go again!`;	
+					title.innerHTML = `Draw! Players ${this.winners.slice(0, this.winners.length-1).join(", ")} and ${this.winners[this.winners.length-1]} go again!`;	
 					title.classList.add("winner");	
 				}, 1000);	
 			};
 		}
 	};
-}
+};
 
 //////////////////////////////////////////////////////////////////
 const form = document.querySelector("#form");
