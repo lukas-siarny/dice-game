@@ -45,15 +45,15 @@ class DiceGame{
 		this.isVaild = false;
 
 		if (this.playersCount === "" || this.dicesCount === ""){
-			Renderer.showAlert(btnCreate, "Please, fill all the requed fields.");
+			this.showAlert(btnCreate, "Please, fill all the requed fields.");
 		} else if (!this.playersCount.match(regEx) || !this.dicesCount.match(regEx)){
-			Renderer.showAlert(btnCreate, "Please, enter the numbers only.");
+			this.showAlert(btnCreate, "Please, enter the numbers only.");
 		} else if ((this.dicesCount < 1 || this.dicesCount > 6) && (this.peopleCount < 2 || this.playersCount > 10)){
-			Renderer.showAlert(btnCreate, "Please, enter correct number of people or dices.");
+			this.showAlert(btnCreate, "Please, enter correct number of people or dices.");
 		} else if (this.dicesCount < 1 || this.dicesCount > 6){
-			Renderer.showAlert(btnCreate, "Please, enter correct number of dices.");
+			this.showAlert(btnCreate, "Please, enter correct number of dices.");
 		} else if (this.playersCount < 2 || this.playersCount > 10){
-			Renderer.showAlert(btnCreate, "Please, enter correct number of people.");
+			this.showAlert(btnCreate, "Please, enter correct number of people.");
 		} else{
 			this.isValid = true;
 			return this.isValid;
