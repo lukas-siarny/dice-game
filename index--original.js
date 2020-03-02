@@ -72,7 +72,7 @@ class DiceGame{
 		this.getWinners();
 
 		//render shaked players to HTML
-		this.renderPlayersShaked(this.players);
+		this.renderPlayersShaked();
 
 		//change shake button content
 		const btn = document.querySelector(".btn");
@@ -83,7 +83,7 @@ class DiceGame{
 
 		//compare results, set the next shake 
 		this.setTheNextShake();
-		console.log(this.players)
+		console.log(this.players);
 	};
 
 	//get new numbers
@@ -131,9 +131,9 @@ class DiceGame{
 	};
 
 	//Render to HTML
-	renderPlayers(players, isShaked){
+	renderPlayers(isShaked){
 		const container = document.querySelector("main .container");
-		players.forEach((item,index) => {
+		this.players.forEach((item,index) => {
 			const div = document.createElement("div");
 			div.className = "dice";
 			let p = document.createElement("p");
@@ -167,10 +167,10 @@ class DiceGame{
 	//Render to HTML - created players by user
 	renderPlayersCreate(){		
 		if(document.querySelector(".dice") === null){
-			this.renderPlayers(this.players);
+			this.renderPlayers();
 		} else{
 			document.querySelectorAll(".dice").forEach(item => item.remove());
-			this.renderPlayers(this.players);
+			this.renderPlayers();
 		}
 
 		this.renderMainHeading();
@@ -208,14 +208,14 @@ class DiceGame{
 	};
 
 	//Render to HTML - players shaked by computer
-	renderPlayersShaked(shakedPlayers){		
-		shakedPlayers = shakedPlayers.filter(player => player.active === true);
+	renderPlayersShaked(){		
+		this.players = this.players.filter(player => player.active === true);
 
 		if(document.querySelector(".dice") === null){
-			this.renderPlayers(shakedPlayers, true);
+			this.renderPlayers(true);
 		} else{
 			document.querySelectorAll(".dice").forEach(item => item.remove());
-			this.renderPlayers(shakedPlayers, true);
+			this.renderPlayers(true);
 		}
 	};
 
