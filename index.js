@@ -240,6 +240,21 @@ class DiceGame{
 			};
 		}
 	};
+
+	//Show alert massage
+	showAlert(button, massage){
+		const subheader = document.querySelector(".subheader");
+		const p = subheader.querySelector("p");
+		subheader.classList.add("subheader-visible");
+		p.innerText = massage;
+		button.classList.add("btn-shake-animation");
+		setTimeout(()=>{
+			button.classList.remove("btn-shake-animation");
+		}, 820);
+		setTimeout(()=>{
+			subheader.classList.remove("subheader-visible");
+		}, 3000);	
+	};
 };
 
 //////////////////////////////////////////////////////////////////
