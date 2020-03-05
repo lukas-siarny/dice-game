@@ -1,7 +1,23 @@
 class DiceGame{
 	constructor(playersCount, dicesCount){
-		this.playersCount = playersCount;
-		this.dicesCount = dicesCount;
+		const regEx = /^[0-9]+$/;
+		const btnCreate = document.querySelector(".btn2");
+		this.isVaild = false;
+
+		if (playersCount === "" || dicesCount === ""){
+			Renderer.showAlert(btnCreate, "Please, fill all the requed fields.");
+		} else if (!playersCount.match(regEx) || !dicesCount.match(regEx)){
+			Renderer.showAlert(btnCreate, "Please, enter the numbers only.");
+		} else if ((dicesCount < 1 || dicesCount > 6) && (peopleCount < 2 || playersCount > 10)){
+			Renderer.showAlert(btnCreate, "Please, enter correct number of people or dices.");
+		} else if (dicesCount < 1 || dicesCount > 6){
+			Renderer.showAlert(btnCreate, "Please, enter correct number of dices.");
+		} else if (playersCount < 2 || playersCount > 10){
+			Renderer.showAlert(btnCreate, "Please, enter correct number of people.");
+		} else{
+			this.playersCount = playersCount;
+			this.dicesCount = dicesCount;
+		};
 	}
 
 	//Create desired number of player instances
@@ -31,34 +47,9 @@ class DiceGame{
 
 	//Initialize Game
 	initializeGame(){
-		this.validation();
-		if (this.isValid === true){
-			this.createPlayersCount();
-			this.renderPlayersCreate();
-		};
+		this.createPlayersCount();
+		this.renderPlayersCreate();
 	};
-
-	//Validation of user insterted data
-	validation(){
-		const regEx = /^[0-9]+$/;
-		const btnCreate = document.querySelector(".btn2");
-		this.isVaild = false;
-
-		if (this.playersCount === "" || this.dicesCount === ""){
-			this.showAlert(btnCreate, "Please, fill all the requed fields.");
-		} else if (!this.playersCount.match(regEx) || !this.dicesCount.match(regEx)){
-			this.showAlert(btnCreate, "Please, enter the numbers only.");
-		} else if ((this.dicesCount < 1 || this.dicesCount > 6) && (this.peopleCount < 2 || this.playersCount > 10)){
-			this.showAlert(btnCreate, "Please, enter correct number of people or dices.");
-		} else if (this.dicesCount < 1 || this.dicesCount > 6){
-			this.showAlert(btnCreate, "Please, enter correct number of dices.");
-		} else if (this.playersCount < 2 || this.playersCount > 10){
-			this.showAlert(btnCreate, "Please, enter correct number of people.");
-		} else{
-			this.isValid = true;
-			return this.isValid;
-		};
-	};	
 
 	//Play
 	play(){
