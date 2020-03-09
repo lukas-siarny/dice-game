@@ -1,64 +1,57 @@
 class DiceGame{
+
 	constructor(playersCount, dicesCount){
 		this.validation(playersCount, dicesCount);
-		if (this.isValid === true){
-			this.playersCount = playersCount;
-			this.dicesCount = dicesCount;
-		}
+    this.createPlayersCount(playersCount, dicesCount);
 	}
 
 	//Validation of user insterted data
 	validation(playersCount, dicesCount){
 		const regEx = /^[0-9]+$/;
 		const btnCreate = document.querySelector(".btn2");
-		this.isVaild = false;
 
 		if (playersCount === "" || dicesCount === ""){
-			Renderer.showAlert(btnCreate, "Please, fill all the requed fields.");
+			this.showAlert(btnCreate, "Please, fill all the requed fields.");
 		} else if (!playersCount.match(regEx) || !dicesCount.match(regEx)){
-			Renderer.showAlert(btnCreate, "Please, enter the numbers only.");
+			this.showAlert(btnCreate, "Please, enter the numbers only.");
 		} else if ((dicesCount < 1 || dicesCount > 6) && (peopleCount < 2 || playersCount > 10)){
-			Renderer.showAlert(btnCreate, "Please, enter correct number of people or dices.");
+			this.showAlert(btnCreate, "Please, enter correct number of people or dices.");
 		} else if (dicesCount < 1 || dicesCount > 6){
-			Renderer.showAlert(btnCreate, "Please, enter correct number of dices.");
+			this.showAlert(btnCreate, "Please, enter correct number of dices.");
 		} else if (playersCount < 2 || playersCount > 10){
-			Renderer.showAlert(btnCreate, "Please, enter correct number of people.");
+			this.showAlert(btnCreate, "Please, enter correct number of people.");
 		} else{
-			return this.isValid = true;
+			return
 		};
+
+    throw "Invalid";
 	};	
 
 
 	//Create desired number of player instances
-	createPlayersCount(){
+	createPlayersCount(playersCount, dicesCount){
 		this.players = [];
-		for (let i=0; i<this.playersCount; i++){
+		for (let i = 0; i < playersCount; i++){
 			this.players.push(
 				this.player = {
 					playerNumber: i+1,
-					dices: this.createDicesPerPlayer(),
+					dices: this.createDicesPerPlayer(dicesCount),
 					active: true,
 					winner: false
 				}
 			);
 		};
-		return this.players;
 	};	
 
 	//Create desired number of dices per player
-	createDicesPerPlayer(){
-		this.dicesPerPlayer = [];
-		for (let i=0; i<this.dicesCount; i++){
-			this.dicesPerPlayer.push(6);
+	createDicesPerPlayer(dicesCount){
+		let dicesPerPlayer = [];
+		for (let i = 0; i < dicesCount; i++){
+			dicesPerPlayer.push(6);
 		}
-		return this.dicesPerPlayer;
+		return dicesPerPlayer;
 	};
 
-	//Initialize Game
-	initializeGame(){
-		this.createPlayersCount();
-		this.renderPlayersCreate();
-	};
 
 	//Play
 	play(){
@@ -266,11 +259,16 @@ form.addEventListener("submit", (e) => {
 	
 	e.preventDefault();	
 	
-	let diceGame = new DiceGame(peopleCount, dicesCount);
-	diceGame.initializeGame();
+  try {
+	  let diceGame = new DiceGame(peopleCount, dicesCount);
+    diceGame.renderPlayersCreate()
 	
-	const btn = document.querySelector(".btn");
-	btn.addEventListener("click", (e) => {
-		diceGame.play();
-	});
+	  const btn = document.querySelector(".btn");
+	  btn.addEventListener("click", (e) => {
+	    diceGame.play();
+	  });
+  }
+  catch(err) {
+    console.log("Something went wrong!")
+  }
 });
