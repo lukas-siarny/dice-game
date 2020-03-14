@@ -1,36 +1,34 @@
 class DiceGame{
-	constructor(playersCount, dicesCount){
-		this.validation(playersCount, dicesCount);
-		if (this.isValid === true){
-			this.playersCount = playersCount;
-			this.dicesCount = dicesCount;
-		}
+	constructor(playersCount, dicesPerPlayerCount){
+		this.validation(playersCount, dicesPerPlayerCount);
+		this.playersCount = playersCount;
+		this.dicesPerPlayerCount = dicesPerPlayerCount;
 	}
 
 	//Validation of user insterted data
-	validation(playersCount, dicesCount){
+	validation(playersCount, dicesPerPlayerCount){
 		const regEx = /^[0-9]+$/;
 		const btnCreate = document.querySelector(".btn2");
-		this.isVaild = false;
-
-		if (playersCount === "" || dicesCount === ""){
-			Renderer.showAlert(btnCreate, "Please, fill all the requed fields.");
-		} else if (!playersCount.match(regEx) || !dicesCount.match(regEx)){
-			Renderer.showAlert(btnCreate, "Please, enter the numbers only.");
-		} else if ((dicesCount < 1 || dicesCount > 6) && (peopleCount < 2 || playersCount > 10)){
-			Renderer.showAlert(btnCreate, "Please, enter correct number of people or dices.");
-		} else if (dicesCount < 1 || dicesCount > 6){
-			Renderer.showAlert(btnCreate, "Please, enter correct number of dices.");
+		if (playersCount === "" || dicesPerPlayerCount === ""){
+			this.showAlert(btnCreate, "Please, fill all the requed fields.");
+			console.log("aaaaaa");
+		} else if (!playersCount.match(regEx) || !dicesPerPlayerCount.match(regEx)){
+			this.showAlert(btnCreate, "Please, enter the numbers only.");
+		} else if ((dicesPerPlayerCount < 1 || dicesPerPlayerCount > 6) && (peopleCount < 2 || playersCount > 10)){
+			this.showAlert(btnCreate, "Please, enter correct number of people or dices.");
+		} else if (dicesPerPlayerCount < 1 || dicesPerPlayerCount > 6){
+			this.showAlert(btnCreate, "Please, enter correct number of dices.");
 		} else if (playersCount < 2 || playersCount > 10){
-			Renderer.showAlert(btnCreate, "Please, enter correct number of people.");
+			this.showAlert(btnCreate, "Please, enter correct number of people.");
 		} else{
-			return this.isValid = true;
+			return;
 		};
+		throw "Invalid input data. The Game won't create";
 	};	
 
 
 	//Create desired number of player instances
-	createPlayersCount(){
+	createPlayers(){
 		this.players = [];
 		for (let i=0; i<this.playersCount; i++){
 			this.players.push(
@@ -47,16 +45,16 @@ class DiceGame{
 
 	//Create desired number of dices per player
 	createDicesPerPlayer(){
-		this.dicesPerPlayer = [];
-		for (let i=0; i<this.dicesCount; i++){
-			this.dicesPerPlayer.push(6);
+		let dicesPerPlayer = [];
+		for (let i=0; i<this.dicesPerPlayerCount; i++){
+			dicesPerPlayer.push(6);
 		}
-		return this.dicesPerPlayer;
+		return dicesPerPlayer;
 	};
 
 	//Initialize Game
 	initializeGame(){
-		this.createPlayersCount();
+		this.createPlayers();
 		this.renderPlayersCreate();
 	};
 
@@ -243,8 +241,10 @@ class DiceGame{
 
 	//Show alert massage
 	showAlert(button, massage){
+
 		const subheader = document.querySelector(".subheader");
 		const p = subheader.querySelector("p");
+		subheader.style.background = "red";
 		subheader.classList.add("subheader-visible");
 		p.innerText = massage;
 		button.classList.add("btn-shake-animation");
@@ -262,15 +262,19 @@ const form = document.querySelector("#form");
 form.addEventListener("submit", (e) => {
 	
 	const peopleCount = document.querySelector("#playersCount").value;
-	const dicesCount = document.querySelector("#dicesCount").value; 	
+	const dicesPerPlayerCount = document.querySelector("#dicesCount").value; 	
 	
 	e.preventDefault();	
 	
-	let diceGame = new DiceGame(peopleCount, dicesCount);
-	diceGame.initializeGame();
-	
-	const btn = document.querySelector(".btn");
-	btn.addEventListener("click", (e) => {
-		diceGame.play();
-	});
+	try{
+		let diceGame = new DiceGame(peopleCount, dicesPerPlayerCount);
+		diceGame.initializeGame();
+		
+		const btn = document.querySelector(".btn");
+		btn.addEventListener("click", (e) => {
+			diceGame.play();
+		});
+  	} catch (error){
+  		console.log(error);
+  	}
 });
