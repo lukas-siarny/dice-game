@@ -1,67 +1,62 @@
 class DiceGame{
-	constructor(playersCount, dicesCount){
+	constructor(playersCount, dicesPerPlayerCount){
+		this.validation(playersCount, dicesPerPlayerCount);
 		this.playersCount = playersCount;
-		this.dicesCount = dicesCount;
+		this.dicesPerPlayerCount = dicesPerPlayerCount;
 	}
 
-	//Create one player instance with desired number of dices
-	createPlayer(playerNumber){
-		this.player = {
-			playerNumber: playerNumber,
-			dices: this.createDicesPerPlayer(),
-			active: true,
-			winner: false,
-		}
-		return this.player;
-	};
+	//Validation of user insterted data
+	validation(playersCount, dicesPerPlayerCount){
+		const regEx = /^[0-9]+$/;
+		const btnCreate = document.querySelector(".btn2");
+		if (playersCount === "" || dicesPerPlayerCount === ""){
+			this.showAlert(btnCreate, "Please, fill all the requed fields.");
+			console.log("aaaaaa");
+		} else if (!playersCount.match(regEx) || !dicesPerPlayerCount.match(regEx)){
+			this.showAlert(btnCreate, "Please, enter the numbers only.");
+		} else if ((dicesPerPlayerCount < 1 || dicesPerPlayerCount > 6) && (peopleCount < 2 || playersCount > 10)){
+			this.showAlert(btnCreate, "Please, enter correct number of people or dices.");
+		} else if (dicesPerPlayerCount < 1 || dicesPerPlayerCount > 6){
+			this.showAlert(btnCreate, "Please, enter correct number of dices.");
+		} else if (playersCount < 2 || playersCount > 10){
+			this.showAlert(btnCreate, "Please, enter correct number of people.");
+		} else{
+			return;
+		};
+		throw "Invalid input data. The Game won't create";
+	};	
 
-	createDicesPerPlayer(){
-		this.dicesPerPlayer = [];
-		for (let i=0; i<this.dicesCount; i++){
-			this.dicesPerPlayer.push(6);
-		}
-		return this.dicesPerPlayer;
-	};
 
 	//Create desired number of player instances
-	createPlayersCount(){
+	createPlayers(){
 		this.players = [];
 		for (let i=0; i<this.playersCount; i++){
-			this.players.push(this.createPlayer(i+1));
+			this.players.push(
+				this.player = {
+					playerNumber: i+1,
+					dices: this.createDicesPerPlayer(),
+					active: true,
+					winner: false
+				}
+			);
 		};
 		return this.players;
 	};	
 
-	//Initialize Game
-	initializeGame(){
-		this.validation();
-		if (this.isValid === true){
-			this.createPlayersCount();
-			Renderer.renderPlayersCreate(this.players);
-		};
+	//Create desired number of dices per player
+	createDicesPerPlayer(){
+		let dicesPerPlayer = [];
+		for (let i=0; i<this.dicesPerPlayerCount; i++){
+			dicesPerPlayer.push(6);
+		}
+		return dicesPerPlayer;
 	};
 
-	//Validation of user insterted data
-	validation(){
-		const regEx = /^[0-9]+$/;
-		const btnCreate = document.querySelector(".btn2");
-		this.isVaild = false;
-
-		if (this.playersCount === "" || this.dicesCount === ""){
-			Renderer.showAlert(btnCreate, "Please, fill all the requed fields.");
-		} else if (!this.playersCount.match(regEx) || !this.dicesCount.match(regEx)){
-			Renderer.showAlert(btnCreate, "Please, enter the numbers only.");
-		} else if ((dicesCount < 1 || dicesCount > 6) && (peopleCount < 2 || playersCount > 10)){
-			Renderer.showAlert(btnCreate, "Please, enter correct number of people or dices.");
-		} else if (dicesCount < 1 || dicesCount > 6){
-			Renderer.showAlert(btnCreate, "Please, enter correct number of dices.");
-		} else if (playersCount < 2 || playersCount > 10){
-			Renderer.showAlert(btnCreate, "Please, enter correct number of people.");
-		} else{
-			this.isValid = true;
-			return this.isValid;
-		};
-	};	
+	//Initialize Game
+	initializeGame(){
+		this.createPlayers();
+		this.renderPlayersCreate();
+	};
 
 	//Play
 	play(){
@@ -75,17 +70,18 @@ class DiceGame{
 		this.getWinners();
 
 		//render shaked players to HTML
-		Renderer.renderPlayersShaked(this.players);
+		this.renderPlayersShaked(this.players);
 
 		//change shake button content
 		const btn = document.querySelector(".btn");
 		setTimeout(() => btn.innerHTML = "Shake again!", 1000);
 
-		//show players with higher sum in main heading
-		Renderer.renderMainHeading(this.players, this.winners, true);
+		//show players with the highest sum in main heading
+		this.renderMainHeading(true);
 
 		//compare results, set the next shake 
 		this.setTheNextShake();
+		console.log(this.players)
 	};
 
 	//get new numbers
@@ -121,9 +117,9 @@ class DiceGame{
 	setTheNextShake(){
 		if (this.winners.length === 1){
 			// if there's only one winner => reset all player's status to active, so everyone can play again
-			this.players.forEach(player => player.active = true);
+			this.players.forEach((player) => player.active = true);
 		} else {
-			// if there's more than one winner => only those player's status is left active, other player's status is set to false
+			// if there's more than one winner => only those players status is left active, other players status is set to false
 			this.players.forEach(player => {
 				if(this.winners.includes(player.playerNumber) !== true){
 					player.active = false;
@@ -131,20 +127,18 @@ class DiceGame{
 			});	
 		}
 	};
-}
 
-class Renderer{
 	//Render to HTML
-	static renderPlayers(players, isShaked){
+	renderPlayers(players, isShaked){
 		const container = document.querySelector("main .container");
 		players.forEach((item,index) => {
 			const div = document.createElement("div");
 			div.className = "dice";
 			let p = document.createElement("p");
-			p.innerHTML = `Player ${players[index].playerNumber}`;
+			p.innerHTML = `Player ${item.playerNumber}`;
 			if(isShaked === true){
 				setTimeout(()=> {
-					p.innerHTML += ` (<strong>${players[index].sum}</strong>)`;
+					p.innerHTML += ` (<strong>${item.sum}</strong>)`;
 				}, 1000);
 			};
 			if(item.winner === true){
@@ -169,15 +163,15 @@ class Renderer{
 	};
 
 	//Render to HTML - created players by user
-	static renderPlayersCreate(players){		
+	renderPlayersCreate(){		
 		if(document.querySelector(".dice") === null){
-			Renderer.renderPlayers(players);
+			this.renderPlayers(this.players);
 		} else{
 			document.querySelectorAll(".dice").forEach(item => item.remove());
-			Renderer.renderPlayers(players);
+			this.renderPlayers(this.players);
 		}
 
-		Renderer.renderMainHeading();
+		this.renderMainHeading();
 		
 		//Just some DOM manimulation
 		const btn = document.querySelector(".btn");
@@ -212,21 +206,45 @@ class Renderer{
 	};
 
 	//Render to HTML - players shaked by computer
-	static renderPlayersShaked(shakedPlayers){		
+	renderPlayersShaked(shakedPlayers){		
 		shakedPlayers = shakedPlayers.filter(player => player.active === true);
 
 		if(document.querySelector(".dice") === null){
-			Renderer.renderPlayers(shakedPlayers, true);
+			this.renderPlayers(shakedPlayers, true);
 		} else{
 			document.querySelectorAll(".dice").forEach(item => item.remove());
-			Renderer.renderPlayers(shakedPlayers, true);
+			this.renderPlayers(shakedPlayers, true);
+		}
+	};
+
+	//show results in main heading
+	renderMainHeading(isShaked){
+		const title = document.querySelector(".buttons h1");
+		title.innerHTML = "C'mon, show them who is the BOSS";
+		title.classList.remove("winner");
+
+		if(isShaked === true){
+			if(this.winners.length === 1){
+				setTimeout(()=>{
+					title.innerHTML = `Player ${this.winners[0]} wins!`;
+					title.classList.add("winner");
+				}, 1000);	
+			} else{
+				this.winners.sort((a,b) => a-b);
+				setTimeout(()=>{
+					title.innerHTML = `Draw! Players ${this.winners.slice(0, this.winners.length-1).join(", ")} and ${this.winners[this.winners.length-1]} go again!`;	
+					title.classList.add("winner");	
+				}, 1000);	
+			};
 		}
 	};
 
 	//Show alert massage
-	static showAlert(button, massage){
+	showAlert(button, massage){
+
 		const subheader = document.querySelector(".subheader");
 		const p = subheader.querySelector("p");
+		subheader.style.background = "red";
 		subheader.classList.add("subheader-visible");
 		p.innerText = massage;
 		button.classList.add("btn-shake-animation");
@@ -237,44 +255,26 @@ class Renderer{
 			subheader.classList.remove("subheader-visible");
 		}, 3000);	
 	};
-
-	//show results in main heading
-	static renderMainHeading(players, winners, isShaked){
-		const title = document.querySelector(".buttons h1");
-		title.innerHTML = "C'mon, show them who is the BOSS";
-		title.classList.remove("winner");
-
-		if(isShaked === true){
-			if(winners.length === 1){
-				setTimeout(()=>{
-					title.innerHTML = `Player ${winners[0]} wins!`;
-					title.classList.add("winner");
-				}, 1000);	
-			} else{
-				winners.sort((a,b) => a-b);
-				setTimeout(()=>{
-					title.innerHTML = `Draw! Players ${winners.slice(0, winners.length-1).join(", ")} and ${winners[winners.length-1]} go again!`;	
-					title.classList.add("winner");	
-				}, 1000);	
-			};
-		}
-	};
-}
+};
 
 //////////////////////////////////////////////////////////////////
 const form = document.querySelector("#form");
 form.addEventListener("submit", (e) => {
 	
 	const peopleCount = document.querySelector("#playersCount").value;
-	const dicesCount = document.querySelector("#dicesCount").value; 	
+	const dicesPerPlayerCount = document.querySelector("#dicesCount").value; 	
 	
 	e.preventDefault();	
 	
-	let diceGame = new DiceGame(peopleCount, dicesCount);
-	diceGame.initializeGame();
-	
-	const btn = document.querySelector(".btn");
-	btn.addEventListener("click", (e) => {
-		diceGame.play();
-	});
+	try{
+		let diceGame = new DiceGame(peopleCount, dicesPerPlayerCount);
+		diceGame.initializeGame();
+		
+		const btn = document.querySelector(".btn");
+		btn.addEventListener("click", (e) => {
+			diceGame.play();
+		});
+  	} catch (error){
+  		console.log(error);
+  	}
 });
